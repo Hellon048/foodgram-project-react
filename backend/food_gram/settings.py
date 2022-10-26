@@ -1,24 +1,21 @@
 import os
 from decouple import Csv, config
 from dotenv import load_dotenv
-
+from pathlib import Path
 
 load_dotenv()
 
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = os.getenv('SECRET_KEY',
-                       default='qbdcy@evkelx^kl6ck&om0##g1-7e7zx7axxybvw_u@vrvl&-3')
+# SECRET_KEY = os.getenv('SECRET_KEY',
+#                        default='qbdcy@evkelx^kl6ck&om0##g1-7e7zx7axxybvw_u@vrvl&-3')
 
-DEBUG = os.getenv('DEBUG', default=True)
+SECRET_KEY = 'qbdcy@evkelx^kl6ck&om0##g1-7e7zx7axxybvw_u@vrvl&-3'
+DEBUG = True
 
-ALLOWED_HOSTS = [os.getenv('ALLOWED_HOSTS', '*')]
+ALLOWED_HOSTS = ['localhost', 'backend', '127.0.0.1', '178.154.226.84']
 
-CSRF_TRUSTED_ORIGINS = config(
-    'CSRF_TRUSTED_ORIGINS',
-    default='http://localhost http://127.0.0.1',
-    cast=Csv()
-)
+CSRF_TRUSTED_ORIGINS = ['http://localhost', 'http://127.0.0.1', 'http://backend']
 
 
 # Application definition
