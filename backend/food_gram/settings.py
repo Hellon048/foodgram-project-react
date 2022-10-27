@@ -1,5 +1,4 @@
 import os
-from decouple import Csv, config
 from dotenv import load_dotenv
 from pathlib import Path
 

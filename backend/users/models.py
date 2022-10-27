@@ -6,9 +6,10 @@ from django.db.models import (CharField, CheckConstraint, EmailField,
 from django.db.models.functions import Length
 from django.utils.translation import gettext_lazy as _
 
-from .validators import MinLenValidator, OneOfTwoValidator
+from .validators import UsernameValidator
 
 CharField.register_lookup(Length)
+username_validator = UsernameValidator()
 
 
 class MyUser(AbstractUser):
@@ -18,15 +19,13 @@ class MyUser(AbstractUser):
         unique=True,
         help_text=conf.USERS_HELP_EMAIL
     )
+
     username = CharField(
         verbose_name='Пользователь',
         max_length=conf.MAX_LEN_USERS_CHARFIELD,
         unique=True,
         help_text=(conf.USERS_HELP_UNAME),
-        validators=(
-            MinLenValidator(min_len=conf.MIN_USERNAME_LENGTH),
-            OneOfTwoValidator(),
-        ),
+        validators=[username_validator],
     )
     first_name = CharField(
         verbose_name='Имя',
