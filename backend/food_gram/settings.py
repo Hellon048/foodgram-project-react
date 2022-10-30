@@ -12,7 +12,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'qbdcy@evkelx^kl6ck&om0##g1-7e7zx7axxybvw_u@vrvl&-3'
 DEBUG = True
 
-ALLOWED_HOSTS = ['localhost', 'backend', '127.0.0.1', '178.154.226.84']
+ALLOWED_HOSTS = ['localhost', 'backend', '127.0.0.1']
 
 CSRF_TRUSTED_ORIGINS = ['http://localhost', 'http://127.0.0.1', 'http://backend']
 
