@@ -1,25 +1,20 @@
-from django.contrib.auth import get_user_model
 from django.db.models import F
-
 from drf_extra_fields.fields import Base64ImageField
-
-from recipes.models import Ingredient, Recipe, Tag
-
+from recipes.models import AmountIngredient, Ingredient, Recipe, Tag
 from rest_framework.serializers import (ModelSerializer, SerializerMethodField,
                                         ValidationError)
-
+from users.models import MyUser
 
 from .conf import MAX_LEN_USERS_CHARFIELD, MIN_USERNAME_LENGTH
 from .services import (check_value_validate, is_hex_color,
                        recipe_amount_ingredients_set)
-
-User = get_user_model()
 
 
 class ShortRecipeSerializer(ModelSerializer):
     """Сериализатор для модели Recipe.
     Определён укороченный набор полей для некоторых эндпоинтов.
     """
+
     class Meta:
         model = Recipe
         fields = 'id', 'name', 'image', 'cooking_time'
@@ -29,10 +24,10 @@ class ShortRecipeSerializer(ModelSerializer):
 class UserSerializer(ModelSerializer):
     """Сериализатор для использования с моделью User.
     """
-    is_subscribed = SerializerMethodField()
+    is_subscribed = SerializerMethodField(method_name="get_is_subscribed")
 
     class Meta:
-        model = User
+        model = MyUser
         fields = (
             'email',
             'id',
@@ -71,7 +66,7 @@ class UserSerializer(ModelSerializer):
         Returns:
             User: Созданный пользователь.
         """
-        user = User(
+        user = MyUser(
             email=validated_data['email'],
             username=validated_data['username'],
             first_name=validated_data['first_name'],
@@ -110,10 +105,10 @@ class UserSubscribeSerializer(UserSerializer):
     """Сериализатор вывода авторов на которых подписан текущий пользователь.
     """
     recipes = ShortRecipeSerializer(many=True, read_only=True)
-    recipes_count = SerializerMethodField()
+    recipes_count = SerializerMethodField(method_name="get_recipes_count")
 
     class Meta:
-        model = User
+        model = MyUser
         fields = (
             'email',
             'id',
@@ -152,6 +147,7 @@ class UserSubscribeSerializer(UserSerializer):
 class TagSerializer(ModelSerializer):
     """Сериализатор для вывода тэгов.
     """
+
     class Meta:
         model = Tag
         fields = '__all__'
@@ -174,6 +170,7 @@ class TagSerializer(ModelSerializer):
 class IngredientSerializer(ModelSerializer):
     """Сериализатор для вывода ингридиентов.
     """
+
     class Meta:
         model = Ingredient
         fields = '__all__'
@@ -185,9 +182,10 @@ class RecipeSerializer(ModelSerializer):
     """
     tags = TagSerializer(many=True, read_only=True)
     author = UserSerializer(read_only=True)
-    ingredients = SerializerMethodField()
-    is_favorited = SerializerMethodField()
-    is_in_shopping_cart = SerializerMethodField()
+    ingredients = SerializerMethodField(method_name="get_ingredients")
+    is_favorited = SerializerMethodField(method_name="get_is_favorited")
+    is_in_shopping_cart = SerializerMethodField(
+        method_name="get_is_in_shopping_cart")
     image = Base64ImageField()
 
     class Meta:
@@ -269,6 +267,7 @@ class RecipeSerializer(ModelSerializer):
         tags = self.initial_data.get('tags')
         ingredients = self.initial_data.get('ingredients')
         values_as_list = (tags, ingredients)
+        cooking_time = data['cooking_time']
 
         for value in values_as_list:
             if not isinstance(value, list):
@@ -295,6 +294,10 @@ class RecipeSerializer(ModelSerializer):
         data['tags'] = tags
         data['ingredients'] = valid_ingredients
         data['author'] = self.context.get('request').user
+        if int(cooking_time) <= 0:
+            raise ValidationError({
+                'cooking_time': 'Время приготовления должно быть больше 0!'
+            })
         return data
 
     def create(self, validated_data):
@@ -316,33 +319,9 @@ class RecipeSerializer(ModelSerializer):
 
     def update(self, recipe, validated_data):
         """Обновляет рецепт.
-
-        Args:
-            recipe (Recipe): Рецепт для изменения.
-            validated_data (dict): Изменённые данные.
-
-        Returns:
-            Recipe: Обновлённый рецепт.
         """
-        tags = validated_data.get('tags')
-        ingredients = validated_data.get('ingredients')
-
-        recipe.image = validated_data.get(
-            'image', recipe.image)
-        recipe.name = validated_data.get(
-            'name', recipe.name)
-        recipe.text = validated_data.get(
-            'text', recipe.text)
-        recipe.cooking_time = validated_data.get(
-            'cooking_time', recipe.cooking_time)
-
-        if tags:
-            recipe.tags.clear()
-            recipe.tags.set(tags)
-
-        if ingredients:
-            recipe.ingredients.clear()
-            recipe_amount_ingredients_set(recipe, ingredients)
-
-        recipe.save()
-        return recipe
+        recipe.tags.clear()
+        AmountIngredient.objects.filter(recipe=recipe).delete()
+        recipe.tags(validated_data.pop('tags'), recipe)
+        recipe.ingredients(validated_data.pop('ingredients'), recipe)
+        return super().update(recipe, validated_data)

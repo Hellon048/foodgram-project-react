@@ -1,29 +1,30 @@
 from datetime import datetime as dt
 from urllib.parse import unquote
 
-from django.contrib.auth import get_user_model
 from django.db.models import F, Sum
 from django.http.response import HttpResponse
-
 from djoser.views import UserViewSet as DjoserUserViewSet
-
-from recipes.models import AmountIngredient, Ingredient, Recipe, Tag
-
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.status import HTTP_400_BAD_REQUEST, HTTP_401_UNAUTHORIZED
 from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet
 
+from recipes.models import AmountIngredient, Tag
+from users.models import MyUser
 from . import conf
 from .mixins import AddDelViewMixin
 from .paginators import PageLimitPagination
-from .permissions import AdminOrReadOnly, AuthorStaffOrReadOnly
+from .permissions import IsAuthorOrAdminOrReadOnly
 from .serializers import (IngredientSerializer, RecipeSerializer,
                           ShortRecipeSerializer, TagSerializer,
                           UserSubscribeSerializer)
 from .services import incorrect_layout
 
-User = get_user_model()
+User = MyUser
+TXT_NAME = "_shopping_list.txt"
+SHOP_LIST = "Список покупок для:"
+COUNT_IN_FOODGRAM = '\n\nПосчитано в Foodgram'
+CONTENT_TYPE = 'text.txt; charset=utf-8'
 
 
 class UserViewSet(DjoserUserViewSet, AddDelViewMixin):
@@ -86,7 +87,7 @@ class TagViewSet(ReadOnlyModelViewSet):
     """
     queryset = Tag.objects.all()
     serializer_class = TagSerializer
-    permission_classes = (AdminOrReadOnly,)
+    permission_classes = (IsAuthorOrAdminOrReadOnly,)
 
 
 class IngredientViewSet(ReadOnlyModelViewSet):
@@ -94,9 +95,8 @@ class IngredientViewSet(ReadOnlyModelViewSet):
 
     Изменение и создание ингридиентов разрешено только админам.
     """
-    queryset = Ingredient.objects.all()
     serializer_class = IngredientSerializer
-    permission_classes = (AdminOrReadOnly,)
+    permission_classes = (IsAuthorOrAdminOrReadOnly,)
 
     def get_queryset(self):
         """Получает queryset в соответствии с параметрами запроса.
@@ -140,9 +140,8 @@ class RecipeViewSet(ModelViewSet, AddDelViewMixin):
     рецепт в избранное и в список покупок.
     Изменять рецепт может только автор или админы.
     """
-    queryset = Recipe.objects.select_related('author')
     serializer_class = RecipeSerializer
-    permission_classes = (AuthorStaffOrReadOnly,)
+    permission_classes = (IsAuthorOrAdminOrReadOnly,)
     pagination_class = PageLimitPagination
     add_serializer = ShortRecipeSerializer
 
@@ -238,20 +237,20 @@ class RecipeViewSet(ModelViewSet, AddDelViewMixin):
             measure=F('ingredients__measurement_unit')
         ).annotate(amount=Sum('amount'))
 
-        filename = f'{user.username}_shopping_list.txt'
+        filename = "{}{}".format(user.username, TXT_NAME)
         shopping_list = (
-            f'Список покупок для:\n\n{user.first_name}\n\n'
-            f'{dt.now().strftime(conf.DATE_TIME_FORMAT)}\n\n'
-        )
+            "{}\n\n{}\n\n{}\n\n"
+        ).format(SHOP_LIST, user.first_name,
+                 dt.now().strftime(conf.DATE_TIME_FORMAT))
         for ing in ingredients:
             shopping_list += (
                 f'{ing["ingredient"]}: {ing["amount"]} {ing["measure"]}\n'
             )
 
-        shopping_list += '\n\nПосчитано в Foodgram'
+        shopping_list += COUNT_IN_FOODGRAM
 
         response = HttpResponse(
-            shopping_list, content_type='text.txt; charset=utf-8'
+            shopping_list, content_type=CONTENT_TYPE
         )
         response['Content-Disposition'] = f'attachment; filename={filename}'
         return response
