@@ -7,13 +7,13 @@ load_dotenv()
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# SECRET_KEY = os.getenv('SECRET_KEY',
-#                        default='qbdcy@evkelx^kl6ck&om0##g1-7e7zx7axxybvw_u@vrvl&-3')
+SECRET_KEY = os.getenv('SECRET_KEY',
+                       default='qbdcy@evkelx^kl6ck&om0##g1-7e7zx7axxybvw_u@vrvl&-3')
 
-SECRET_KEY = 'qbdcy@evkelx^kl6ck&om0##g1-7e7zx7axxybvw_u@vrvl&-3'
-DEBUG = True
 
-ALLOWED_HOSTS = ['localhost', 'backend', '127.0.0.1']
+DEBUG = os.getenv('DEBUG', default=False)
+
+ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', default='*')
 
 CSRF_TRUSTED_ORIGINS = ['http://localhost', 'http://127.0.0.1', 'http://backend']
 
@@ -21,6 +21,7 @@ CSRF_TRUSTED_ORIGINS = ['http://localhost', 'http://127.0.0.1', 'http://backend'
 # Application definition
 
 INSTALLED_APPS = [
+    'users.apps.UsersConfig',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -30,11 +31,10 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework.authtoken',
     'djoser',
+    'django_extensions',
     'django_filters',
     'api.apps.ApiConfig',
     'recipes.apps.RecipesConfig',
-    'users.apps.UsersConfig',
-    'django_extensions',
 ]
 
 MIDDLEWARE = [
@@ -127,7 +127,7 @@ DJOSER = {
 }
 
 LANGUAGE_CODE = 'ru'
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Europe/Moscow'
 USE_I18N = True
 USE_TZ = True
 

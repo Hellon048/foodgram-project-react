@@ -96,14 +96,8 @@ class Recipe(Model):
     )
     author = ForeignKey(
         verbose_name='Автор рецепта',
-        related_name='recipes',
         to=User,
         on_delete=CASCADE,
-    )
-    favorite = ManyToManyField(
-        verbose_name='Понравившиеся рецепты',
-        related_name='favorites',
-        to=User,
     )
     tags = ManyToManyField(
         verbose_name='Тег',
@@ -115,11 +109,6 @@ class Recipe(Model):
         related_name='recipes',
         to=Ingredient,
         through='recipes.AmountIngredient',
-    )
-    cart = ManyToManyField(
-        verbose_name='Список покупок',
-        related_name='carts',
-        to=User,
     )
     pub_date = DateTimeField(
         verbose_name='Дата публикации',
@@ -135,7 +124,7 @@ class Recipe(Model):
     )
     cooking_time = PositiveSmallIntegerField(
         verbose_name='Время приготовления',
-        default=0,
+        default=1,
         validators=(
             MinValueValidator(
                 1,
@@ -170,19 +159,19 @@ class Recipe(Model):
 class AmountIngredient(Model):
     recipe = ForeignKey(
         verbose_name='В каких рецептах',
-        related_name='ingredient',
+        related_name='ingredient_recipe',
         to=Recipe,
         on_delete=CASCADE,
     )
     ingredients = ForeignKey(
         verbose_name='Связанные ингредиенты',
-        related_name='recipe',
+        related_name='ingredient_recipe',
         to=Ingredient,
         on_delete=CASCADE,
     )
     amount = PositiveSmallIntegerField(
         verbose_name='Количество',
-        default=0,
+        default=1,
         validators=(
             MinValueValidator(
                 1, 'Нужно хоть какое-то количество.'
@@ -206,3 +195,55 @@ class AmountIngredient(Model):
 
     def __str__(self) -> str:
         return f'{self.amount} {self.ingredients}'
+
+
+class Favorite(Model):
+    """ Модель добавление в избраное. """
+    user = ForeignKey(
+        User,
+        on_delete=CASCADE,
+        verbose_name='Пользователь',
+        related_name='favorites',
+    )
+    recipe = ForeignKey(
+        Recipe,
+        on_delete=CASCADE,
+        verbose_name='Рецепт',
+        related_name='favorites',
+    )
+
+    class Meta:
+        constraints = [
+            UniqueConstraint(
+                fields=('user', 'recipe'),
+                name='user_favorite_unique'
+            )
+        ]
+        verbose_name = 'Избранный рецепт'
+        verbose_name_plural = 'Избранные рецепты'
+
+
+class ShoppingCart(Model):
+    """ Модель списка покупок. """
+    user = ForeignKey(
+        User,
+        on_delete=CASCADE,
+        verbose_name='Пользователь',
+        related_name='shopping_list',
+    )
+    recipe = ForeignKey(
+        Recipe,
+        on_delete=CASCADE,
+        verbose_name='Рецепт',
+        related_name='shopping_list',
+    )
+
+    class Meta:
+        constraints = [
+            UniqueConstraint(
+                fields=('user', 'recipe'),
+                name='user_shoppinglist_unique'
+            )
+        ]
+        verbose_name = 'Список покупок'
+        verbose_name_plural = 'Список покупок'
