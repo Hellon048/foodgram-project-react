@@ -5,7 +5,6 @@ from django.db.models.functions import Length
 from django.utils.translation import gettext_lazy as _
 
 from api import conf
-
 from .validators import username_validation
 
 CharField.register_lookup(Length)
@@ -24,8 +23,7 @@ class MyUser(AbstractUser):
         max_length=conf.MAX_LEN_USERS_CHARFIELD,
         unique=True,
         help_text=(conf.USERS_HELP_UNAME),
-        validators=(username_validation(),
-                    ),
+        validators=username_validation,
     )
     first_name = CharField(
         verbose_name='Имя',
