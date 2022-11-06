@@ -4,13 +4,13 @@ from urllib.parse import unquote
 from django.db.models import F, Sum
 from django.http.response import HttpResponse
 from djoser.views import UserViewSet as DjoserUserViewSet
-
-import recipes.models
-from recipes.models import AmountIngredient, Tag
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.status import HTTP_400_BAD_REQUEST, HTTP_401_UNAUTHORIZED
 from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet
+
+import recipes.models
+from recipes.models import AmountIngredient, Tag
 from users.models import MyUser
 
 from . import conf
@@ -128,7 +128,6 @@ class IngredientViewSet(ReadOnlyModelViewSet):
             stw_queryset.extend(
                 [i for i in cnt_queryset if i not in stw_queryset]
             )
-            queryset = stw_queryset
         return queryset
 
 

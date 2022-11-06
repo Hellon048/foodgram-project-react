@@ -6,6 +6,7 @@ from rest_framework.serializers import (ModelSerializer, SerializerMethodField,
 from recipes.models import AmountIngredient, Ingredient, Recipe, Tag
 from users.models import MyUser
 from users.validators import username_validation
+
 from .services import (check_value_validate, is_hex_color,
                        recipe_amount_ingredients_set)
 
@@ -196,10 +197,9 @@ class RecipeSerializer(ModelSerializer):
         Returns:
             list: Список ингридиентов в рецепте.
         """
-        ingredients = obj.ingredients.values(
+        obj.ingredients.values(
             'id', 'name', 'measurement_unit', amount=F('recipe__amount')
         )
-        return ingredients
 
     def get_is_favorited(self, obj):
         """Проверка - находится ли рецепт в избранном.
