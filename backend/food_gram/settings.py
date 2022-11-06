@@ -16,7 +16,7 @@ DEBUG = os.getenv('DEBUG', default=False)
 ALLOWED_HOSTS = [os.getenv('ALLOWED_HOSTS', '*')]
 # ALLOWED_HOSTS = ['localhost', 'backend', '127.0.0.1']
 
-CSRF_TRUSTED_ORIGINS = ['http://localhost', 'http://127.0.0.1', 'http://backend', 'http://51.250.3.210']
+CSRF_TRUSTED_ORIGINS = ['http://localhost', 'http://127.0.0.1', 'http://backend', '51.250.3.210']
 
 
 # Application definition
