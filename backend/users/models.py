@@ -5,6 +5,7 @@ from django.db.models.functions import Length
 from django.utils.translation import gettext_lazy as _
 
 from api import conf
+
 from .validators import username_validation
 
 CharField.register_lookup(Length)

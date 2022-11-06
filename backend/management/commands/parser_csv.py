@@ -2,6 +2,7 @@ import csv
 from pathlib import Path
 
 from django.core.management.base import BaseCommand
+
 from food_gram.settings import BASE_DIR
 from recipes.models import Ingredient
 

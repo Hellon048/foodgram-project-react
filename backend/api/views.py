@@ -12,7 +12,6 @@ from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet
 import recipes.models
 from recipes.models import AmountIngredient, Tag
 from users.models import MyUser
-
 from . import conf
 from .mixins import AddDelViewMixin
 from .paginators import PageLimitPagination
@@ -124,9 +123,9 @@ class IngredientViewSet(ReadOnlyModelViewSet):
                 name = name.translate(incorrect_layout)
             name = name.lower()
             stw_queryset = list(queryset.filter(name__startswith=name))
-            cnt_queryset = queryset.filter(name__contains=name)
             stw_queryset.extend(
-                [i for i in cnt_queryset if i not in stw_queryset]
+                [i for i in queryset.filter(name__contains=name) if
+                 i not in list(queryset.filter(name__startswith=name))]
             )
         return queryset
 
