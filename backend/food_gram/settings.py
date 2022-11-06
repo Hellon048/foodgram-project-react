@@ -1,11 +1,11 @@
 import os
-# from pathlib import Path
+from pathlib import Path
 
 from dotenv import load_dotenv
 
 load_dotenv()
 
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = os.getenv('SECRET_KEY',
                        default='qbdcy@evkelx^kl6ck&om0##g1-7e7zx7axxybvw_u@vrvl&-3')
@@ -16,7 +16,7 @@ ALLOWED_HOSTS = [os.getenv('ALLOWED_HOSTS', '*')]
 # ALLOWED_HOSTS = ['localhost', 'backend', '127.0.0.1']
 
 CSRF_TRUSTED_ORIGINS = ['http://localhost', 'http://127.0.0.1',
-                        'http://backend', '51.250.3.210']
+                        'http://backend', 'http://51.250.3.210']
 
 # Application definition
 
