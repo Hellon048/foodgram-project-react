@@ -15,7 +15,7 @@ services:
       - ./.env
 
   backend:
-    image: hellon048/backend:v3
+    image: hellon048/backend:latest
     restart: always
     volumes:
       - static_value:/app/static/
