@@ -24,6 +24,7 @@ jobs:
 
     - name: Test with flake8
       run: |
+        isort .
         python -m flake8 backend
 
   build_and_push_to_docker_hub:
