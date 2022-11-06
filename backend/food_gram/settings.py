@@ -10,14 +10,13 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.getenv('SECRET_KEY',
                        default='qbdcy@evkelx^kl6ck&om0##g1-7e7zx7axxybvw_u@vrvl&-3')
 
-
 DEBUG = os.getenv('DEBUG', default=False)
 
 ALLOWED_HOSTS = [os.getenv('ALLOWED_HOSTS', '*')]
 # ALLOWED_HOSTS = ['localhost', 'backend', '127.0.0.1']
 
-CSRF_TRUSTED_ORIGINS = ['http://localhost', 'http://127.0.0.1', 'http://backend', '51.250.3.210']
-
+CSRF_TRUSTED_ORIGINS = ['http://localhost', 'http://127.0.0.1',
+                        'http://backend', '51.250.3.210']
 
 # Application definition
 
@@ -68,7 +67,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'food_gram.wsgi.application'
 
-
 if DEBUG:
     DATABASES = {
         'default': {
@@ -80,7 +78,8 @@ if DEBUG:
 if not DEBUG:
     DATABASES = {
         'default': {
-            'ENGINE': os.getenv('DB_ENGINE', default='django.db.backends.postgresql'),
+            'ENGINE': os.getenv('DB_ENGINE',
+                                default='django.db.backends.postgresql'),
             'NAME': os.getenv('DB_NAME', default='postgres'),
             'USER': os.getenv('POSTGRES_USER', default='postgres'),
             'PASSWORD': os.getenv('POSTGRES_PASSWORD', default='postgres'),
@@ -93,21 +92,21 @@ AUTH_USER_MODEL = 'users.MyUser'
 
 AUTH_PASSWORD_VALIDATORS = [
     {'NAME':
-     'django.contrib.auth.password_validation.UserAttributeSimilarityValidator', },
+         'django.contrib.auth.password_validation.UserAttributeSimilarityValidator', },
     {'NAME':
-     'django.contrib.auth.password_validation.MinimumLengthValidator', },
+         'django.contrib.auth.password_validation.MinimumLengthValidator', },
     {'NAME':
-     'django.contrib.auth.password_validation.CommonPasswordValidator', },
+         'django.contrib.auth.password_validation.CommonPasswordValidator', },
     {'NAME':
-     'django.contrib.auth.password_validation.NumericPasswordValidator', },
+         'django.contrib.auth.password_validation.NumericPasswordValidator', },
 ]
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES':
-    ['rest_framework.authentication.TokenAuthentication', ],
+        ['rest_framework.authentication.TokenAuthentication', ],
 
     'DEFAULT_PERMISSION_CLASSES':
-    ['rest_framework.permissions.IsAuthenticatedOrReadOnly', ],
+        ['rest_framework.permissions.IsAuthenticatedOrReadOnly', ],
 }
 
 DJOSER = {
