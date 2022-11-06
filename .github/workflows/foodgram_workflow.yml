@@ -48,7 +48,7 @@ jobs:
           context: ./backend
           file: ./backend/Dockerfile
           push: true
-          tags: ${{ secrets.DOCKER_USERNAME }}/backend:latest
+          tags: ${{ secrets.DOCKER_USERNAME }}/backend:v3
 
   deploy:
     runs-on: ubuntu-latest
@@ -64,7 +64,7 @@ jobs:
           passphrase: ${{ secrets.PASSPHRASE }}
           script: |
             sudo docker pull ${{ secrets.DOCKER_USERNAME }}/frontend:latest
-            sudo docker pull ${{ secrets.DOCKER_USERNAME }}/backend:latest
+            sudo docker pull ${{ secrets.DOCKER_USERNAME }}/backend:v3
             sudo docker-compose stop
             sudo docker-compose rm backend
             rm .env
