@@ -1,11 +1,11 @@
 from django.db.models import F
 from drf_extra_fields.fields import Base64ImageField
-from recipes.models import AmountIngredient, Ingredient, Recipe, Tag
 from rest_framework.serializers import (ModelSerializer, SerializerMethodField,
                                         ValidationError)
-from users.models import MyUser
 
-from .conf import MAX_LEN_USERS_CHARFIELD, MIN_USERNAME_LENGTH
+from recipes.models import AmountIngredient, Ingredient, Recipe, Tag
+from users.models import MyUser
+from users.validators import username_validation
 from .services import (check_value_validate, is_hex_color,
                        recipe_amount_ingredients_set)
 
@@ -24,7 +24,7 @@ class ShortRecipeSerializer(ModelSerializer):
 class UserSerializer(ModelSerializer):
     """Сериализатор для использования с моделью User.
     """
-    is_subscribed = SerializerMethodField(method_name="get_is_subscribed")
+    is_subscribed = SerializerMethodField(method_name='get_is_subscribed')
 
     class Meta:
         model = MyUser
@@ -76,36 +76,16 @@ class UserSerializer(ModelSerializer):
         user.save()
         return user
 
-    def validate_username(self, username):
-        """Проверяет введённый юзернейм.
-
-        Args:
-            username (str): Введёный пользователем юзернейм.
-
-        Raises:
-            ValidationError: Некорректная длина юзернейма.
-            ValidationError: Юзернейм содержит не только буквы.
-
-        Returns:
-            str: Юзернейм.
-        """
-        if len(username) < MIN_USERNAME_LENGTH:
-            raise ValidationError(
-                'Длина username допустима от '
-                f'{MIN_USERNAME_LENGTH} до {MAX_LEN_USERS_CHARFIELD}'
-            )
-        if not username.isalpha():
-            raise ValidationError(
-                'В username допустимы только буквы.'
-            )
-        return username.capitalize()
+    def validate_username(self, value):
+        """Проверяет корректность имени пользователя."""
+        return username_validation(value)
 
 
 class UserSubscribeSerializer(UserSerializer):
     """Сериализатор вывода авторов на которых подписан текущий пользователь.
     """
     recipes = ShortRecipeSerializer(many=True, read_only=True)
-    recipes_count = SerializerMethodField(method_name="get_recipes_count")
+    recipes_count = SerializerMethodField(method_name='get_recipes_count')
 
     class Meta:
         model = MyUser
@@ -182,10 +162,10 @@ class RecipeSerializer(ModelSerializer):
     """
     tags = TagSerializer(many=True, read_only=True)
     author = UserSerializer(read_only=True)
-    ingredients = SerializerMethodField(method_name="get_ingredients")
-    is_favorited = SerializerMethodField(method_name="get_is_favorited")
+    ingredients = SerializerMethodField(method_name='get_ingredients')
+    is_favorited = SerializerMethodField(method_name='get_is_favorited')
     is_in_shopping_cart = SerializerMethodField(
-        method_name="get_is_in_shopping_cart")
+        method_name='get_is_in_shopping_cart')
     image = Base64ImageField()
 
     class Meta:

@@ -1,5 +1,3 @@
-from api.conf import MAX_LEN_RECIPES_CHARFIELD, MAX_LEN_RECIPES_TEXTFIELD
-from django.contrib.auth import get_user_model
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db.models import (CASCADE, CharField, CheckConstraint,
                               DateTimeField, ForeignKey, ImageField,
@@ -8,13 +6,13 @@ from django.db.models import (CASCADE, CharField, CheckConstraint,
                               UniqueConstraint)
 from django.db.models.functions import Length
 
-CharField.register_lookup(Length)
+from api.conf import MAX_LEN_RECIPES_CHARFIELD, MAX_LEN_RECIPES_TEXTFIELD
+from users.models import MyUser
 
-User = get_user_model()
+CharField.register_lookup(Length)
 
 
 class Tag(Model):
-
     name = CharField(
         verbose_name='Тэг',
         max_length=MAX_LEN_RECIPES_CHARFIELD,
@@ -36,7 +34,7 @@ class Tag(Model):
     class Meta:
         verbose_name = 'Тэг'
         verbose_name_plural = 'Тэги'
-        ordering = ('name', )
+        ordering = ('name',)
         constraints = (
             CheckConstraint(
                 check=Q(name__length__gt=0),
@@ -69,7 +67,7 @@ class Ingredient(Model):
     class Meta:
         verbose_name = 'Ингридиент'
         verbose_name_plural = 'Ингридиенты'
-        ordering = ('name', )
+        ordering = ('name',)
         constraints = (
             UniqueConstraint(
                 fields=('name', 'measurement_unit'),
@@ -96,7 +94,7 @@ class Recipe(Model):
     )
     author = ForeignKey(
         verbose_name='Автор рецепта',
-        to=User,
+        to=MyUser,
         on_delete=CASCADE,
     )
     tags = ManyToManyField(
@@ -140,7 +138,7 @@ class Recipe(Model):
     class Meta:
         verbose_name = 'Рецепт'
         verbose_name_plural = 'Рецепты'
-        ordering = ('-pub_date', )
+        ordering = ('-pub_date',)
         constraints = (
             UniqueConstraint(
                 fields=('name', 'author'),
@@ -159,13 +157,11 @@ class Recipe(Model):
 class AmountIngredient(Model):
     recipe = ForeignKey(
         verbose_name='В каких рецептах',
-        related_name='ingredient_recipe',
         to=Recipe,
         on_delete=CASCADE,
     )
     ingredients = ForeignKey(
         verbose_name='Связанные ингредиенты',
-        related_name='ingredient_recipe',
         to=Ingredient,
         on_delete=CASCADE,
     )
@@ -183,12 +179,13 @@ class AmountIngredient(Model):
     )
 
     class Meta:
+        default_related_name = 'AmountIngredient'
         verbose_name = 'Ингридиент'
         verbose_name_plural = 'Количество ингридиентов'
-        ordering = ('recipe', )
+        ordering = ('recipe',)
         constraints = (
             UniqueConstraint(
-                fields=('recipe', 'ingredients', ),
+                fields=('recipe', 'ingredients',),
                 name='\n%(app_label)s_%(class)s ingredient alredy added\n',
             ),
         )
@@ -200,7 +197,7 @@ class AmountIngredient(Model):
 class Favorite(Model):
     """ Модель добавление в избраное. """
     user = ForeignKey(
-        User,
+        MyUser,
         on_delete=CASCADE,
         verbose_name='Пользователь',
         related_name='favorites',
@@ -226,7 +223,7 @@ class Favorite(Model):
 class ShoppingCart(Model):
     """ Модель списка покупок. """
     user = ForeignKey(
-        User,
+        MyUser,
         on_delete=CASCADE,
         verbose_name='Пользователь',
         related_name='shopping_list',

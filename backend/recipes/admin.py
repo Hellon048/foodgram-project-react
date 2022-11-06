@@ -36,7 +36,7 @@ class IngredientAdmin(ModelAdmin):
 @register(Recipe)
 class RecipeAdmin(ModelAdmin):
     list_display = (
-        'name', 'author', 'get_image',
+        'name', 'author', 'get_image', 'get_ingredients',
     )
     fields = (
         ('name', 'cooking_time',),
@@ -60,6 +60,12 @@ class RecipeAdmin(ModelAdmin):
         return mark_safe(f'<img src={obj.image.url} width="80" hieght="30"')
 
     get_image.short_description = 'Изображение'
+
+    def get_ingredients(self, obj):
+        return ', '.join(
+            [str(ingredients) for ingredients in obj.ingredients.all()]
+        )
+    get_ingredients.short_description = 'Ингредиенты'
 
 
 @register(Tag)

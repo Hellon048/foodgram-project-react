@@ -4,6 +4,8 @@ from urllib.parse import unquote
 from django.db.models import F, Sum
 from django.http.response import HttpResponse
 from djoser.views import UserViewSet as DjoserUserViewSet
+
+import recipes.models
 from recipes.models import AmountIngredient, Tag
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -114,7 +116,7 @@ class IngredientViewSet(ReadOnlyModelViewSet):
         TODO: `exclude` in queryset.
         """
         name = self.request.query_params.get(conf.SEARCH_ING_NAME)
-        queryset = self.queryset
+        queryset = recipes.models.Ingredient.objects.all()
         if name:
             if name[0] == '%':
                 name = unquote(name)
@@ -151,7 +153,7 @@ class RecipeViewSet(ModelViewSet, AddDelViewMixin):
         Returns:
             QuerySet: Список запрошенных объектов.
         """
-        queryset = self.queryset
+        queryset = recipes.models.Recipe.objects.all()
 
         tags = self.request.query_params.getlist(conf.TAGS)
         if tags:

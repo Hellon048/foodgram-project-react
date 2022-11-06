@@ -1,7 +1,8 @@
 from string import hexdigits
 
-from recipes.models import AmountIngredient
 from rest_framework.serializers import ValidationError
+
+from recipes.models import AmountIngredient
 
 
 def recipe_amount_ingredients_set(recipe, ingredients):
@@ -15,7 +16,7 @@ def recipe_amount_ingredients_set(recipe, ingredients):
             amount=ingredient['amount']
         )
         ingredients_list.append(new_ingredient)
-        return AmountIngredient.objects.bulk_create(ingredients_list)
+        AmountIngredient.objects.bulk_create(ingredients_list)
 
 
 def check_value_validate(value, klass=None):

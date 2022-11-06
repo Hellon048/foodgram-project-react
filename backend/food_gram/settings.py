@@ -13,7 +13,8 @@ SECRET_KEY = os.getenv('SECRET_KEY',
 
 DEBUG = os.getenv('DEBUG', default=False)
 
-ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', default='*')
+# ALLOWED_HOSTS = [os.getenv('ALLOWED_HOSTS', '*')]
+ALLOWED_HOSTS = ['localhost', 'backend', '127.0.0.1']
 
 CSRF_TRUSTED_ORIGINS = ['http://localhost', 'http://127.0.0.1', 'http://backend']
 
@@ -21,7 +22,6 @@ CSRF_TRUSTED_ORIGINS = ['http://localhost', 'http://127.0.0.1', 'http://backend'
 # Application definition
 
 INSTALLED_APPS = [
-    'users.apps.UsersConfig',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -31,10 +31,11 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework.authtoken',
     'djoser',
+    'users.apps.UsersConfig',
     'django_extensions',
     'django_filters',
-    'api.apps.ApiConfig',
     'recipes.apps.RecipesConfig',
+    'api.apps.ApiConfig',
 ]
 
 MIDDLEWARE = [
@@ -113,10 +114,8 @@ DJOSER = {
     'LOGIN_FIELD': 'email',
     'HIDE_USERS': False,
     'PERMISSIONS': {
-        'resipe': ('api.permissions.AuthorStaffOrReadOnly,',),
-        'recipe_list': ('api.permissions.AuthorStaffOrReadOnly',),
-        'user': ('api.permissions.OwnerUserOrReadOnly',),
-        'user_list': ('api.permissions.OwnerUserOrReadOnly',),
+        'user': ('api.permissions.IsAuthorOrAdminOrReadOnly',),
+        'user_list': ('api.permissions.AllowAny',),
     },
     'SERIALIZERS': {
         'user': 'api.serializers.UserSerializer',
