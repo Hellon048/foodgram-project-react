@@ -179,7 +179,7 @@ class RecipeViewSet(ModelViewSet, AddDelViewMixin):
         if is_favorited in conf.SYMBOL_FALSE_SEARCH:
             queryset = queryset.exclude(favorite=user.id)
 
-        return queryset
+        return queryset.exclude(favorite=user.id)
 
     @action(methods=conf.ACTION_METHODS, detail=True)
     def favorite(self, request, pk):
