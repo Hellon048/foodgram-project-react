@@ -5,7 +5,7 @@ from rest_framework.serializers import (ModelSerializer, SerializerMethodField,
 
 from recipes.models import AmountIngredient, Ingredient, Recipe, Tag
 from users.models import MyUser
-from users.validators import username_validation
+# from users.validators import username_validation
 
 from .services import (check_value_validate, is_hex_color,
                        recipe_amount_ingredients_set)
@@ -77,9 +77,9 @@ class UserSerializer(ModelSerializer):
         user.save()
         return user
 
-    def validate_username(self, value):
-        """Проверяет корректность имени пользователя."""
-        return username_validation(value)
+    # def validate_username(self, value):
+    #     """Проверяет корректность имени пользователя."""
+    #     return username_validation(value)
 
 
 class UserSubscribeSerializer(UserSerializer):
