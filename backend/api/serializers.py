@@ -15,7 +15,6 @@ class ShortRecipeSerializer(ModelSerializer):
     """Сериализатор для модели Recipe.
     Определён укороченный набор полей для некоторых эндпоинтов.
     """
-
     class Meta:
         model = Recipe
         fields = 'id', 'name', 'image', 'cooking_time'
