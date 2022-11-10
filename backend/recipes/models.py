@@ -179,13 +179,12 @@ class AmountIngredient(Model):
     )
 
     class Meta:
-        default_related_name = 'AmountIngredient'
         verbose_name = 'Ингридиент'
         verbose_name_plural = 'Количество ингридиентов'
         ordering = ('recipe',)
         constraints = (
             UniqueConstraint(
-                fields=('recipe', 'ingredients',),
+                fields=('recipe', 'ingredients'),
                 name='\n%(app_label)s_%(class)s ingredient alredy added\n',
             ),
         )
