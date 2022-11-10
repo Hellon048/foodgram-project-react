@@ -96,6 +96,7 @@ class Recipe(Model):
         verbose_name='Автор рецепта',
         to=MyUser,
         on_delete=CASCADE,
+        related_name='recipes',
     )
     tags = ManyToManyField(
         verbose_name='Тег',
