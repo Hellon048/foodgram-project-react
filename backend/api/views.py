@@ -9,8 +9,7 @@ from rest_framework.response import Response
 from rest_framework.status import HTTP_400_BAD_REQUEST, HTTP_401_UNAUTHORIZED
 from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet
 
-import recipes.models
-from recipes.models import AmountIngredient, Tag
+from recipes.models import AmountIngredient, Tag, Ingredient, Recipe
 from users.models import MyUser
 from . import conf
 from .mixins import AddDelViewMixin
@@ -115,7 +114,7 @@ class IngredientViewSet(ReadOnlyModelViewSet):
         TODO: `exclude` in queryset.
         """
         name = self.request.query_params.get(conf.SEARCH_ING_NAME)
-        queryset = recipes.models.Ingredient.objects.all()
+        queryset = Ingredient.objects.all()
         if name:
             if name[0] == '%':
                 name = unquote(name)
@@ -123,10 +122,11 @@ class IngredientViewSet(ReadOnlyModelViewSet):
                 name = name.translate(incorrect_layout)
             name = name.lower()
             stw_queryset = list(queryset.filter(name__startswith=name))
+            cnt_queryset = queryset.filter(name__contains=name)
             stw_queryset.extend(
-                [i for i in queryset.filter(name__contains=name) if
-                 i not in list(queryset.filter(name__startswith=name))]
+                [i for i in cnt_queryset if i not in stw_queryset]
             )
+            queryset = stw_queryset
         return queryset
 
 
@@ -151,7 +151,7 @@ class RecipeViewSet(ModelViewSet, AddDelViewMixin):
         Returns:
             QuerySet: Список запрошенных объектов.
         """
-        queryset = recipes.models.Recipe.objects.all()
+        queryset = Recipe.objects.all()
 
         tags = self.request.query_params.getlist(conf.TAGS)
         if tags:
