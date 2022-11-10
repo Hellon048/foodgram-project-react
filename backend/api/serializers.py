@@ -78,6 +78,7 @@ class UserSerializer(ModelSerializer):
 
     def validate_username(self, value):
         """Проверяет корректность имени пользователя."""
+
         return username_validation(value)
 
 
