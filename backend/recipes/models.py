@@ -13,18 +13,28 @@ CharField.register_lookup(Length)
 
 
 class Tag(Model):
+    BLUE = '#0000FF'
+    ORANGE = '#FFA500'
+    GREEN = '#008000'
+    PURPLE = '#800080'
+    YELLOW = '#FFFF00'
+
+    COLOR_CHOICES = [
+        (BLUE, 'Синий'),
+        (ORANGE, 'Оранжевый'),
+        (GREEN, 'Зеленый'),
+        (PURPLE, 'Фиолетовый'),
+        (YELLOW, 'Желтый'),
+    ]
     name = CharField(
         verbose_name='Тэг',
         max_length=MAX_LEN_RECIPES_CHARFIELD,
         unique=True,
     )
-    color = CharField(
-        verbose_name='Цветовой HEX-код',
-        max_length=6,
-        blank=True,
-        null=True,
-        default='FF',
-    )
+    color = CharField(max_length=7,
+                      unique=True,
+                      choices=COLOR_CHOICES,
+                      verbose_name='Цвет в HEX')
     slug = CharField(
         verbose_name='Слаг тэга',
         max_length=MAX_LEN_RECIPES_CHARFIELD,

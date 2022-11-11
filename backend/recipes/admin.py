@@ -1,7 +1,7 @@
 from django.contrib.admin import ModelAdmin, TabularInline, register, site
 from django.utils.safestring import mark_safe
 
-from .models import AmountIngredient, Ingredient, Recipe, Tag
+from .models import AmountIngredient, Ingredient, Recipe, Tag, Favorite
 
 site.site_header = 'Администрирование Foodgram'
 EMPTY_VALUE_DISPLAY = 'Значение не указано'
@@ -66,6 +66,11 @@ class RecipeAdmin(ModelAdmin):
             [str(ingredients) for ingredients in obj.ingredients.all()]
         )
     get_ingredients.short_description = 'Ингредиенты'
+
+    def favorites(self, obj):
+        if Favorite.objects.filter(recipe=obj).exists():
+            return Favorite.objects.filter(recipe=obj).count()
+        return 0
 
 
 @register(Tag)

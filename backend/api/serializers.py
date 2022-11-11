@@ -304,3 +304,6 @@ class RecipeSerializer(ModelSerializer):
         recipe.tags(validated_data.pop('tags'), recipe)
         recipe.ingredients(validated_data.pop('ingredients'), recipe)
         return super().update(recipe, validated_data)
+
+    def to_representation(self, instance):
+        return RecipeSerializer(instance).data

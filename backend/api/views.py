@@ -9,12 +9,12 @@ from rest_framework.response import Response
 from rest_framework.status import HTTP_400_BAD_REQUEST, HTTP_401_UNAUTHORIZED
 from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet
 
+from . import conf
 from recipes.models import AmountIngredient, Tag, Ingredient, Recipe
 from users.models import MyUser
-from . import conf
 from .mixins import AddDelViewMixin
 from .paginators import PageLimitPagination
-from .permissions import IsAuthorOrAdminOrReadOnly
+from .permissions import IsOwnerOrReadOnly
 from .serializers import (IngredientSerializer, RecipeSerializer,
                           ShortRecipeSerializer, TagSerializer,
                           UserSubscribeSerializer)
@@ -87,7 +87,7 @@ class TagViewSet(ReadOnlyModelViewSet):
     """
     queryset = Tag.objects.all()
     serializer_class = TagSerializer
-    permission_classes = (IsAuthorOrAdminOrReadOnly,)
+    permission_classes = (IsOwnerOrReadOnly,)
 
 
 class IngredientViewSet(ReadOnlyModelViewSet):
@@ -96,7 +96,7 @@ class IngredientViewSet(ReadOnlyModelViewSet):
     Изменение и создание ингридиентов разрешено только админам.
     """
     serializer_class = IngredientSerializer
-    permission_classes = (IsAuthorOrAdminOrReadOnly,)
+    permission_classes = (IsOwnerOrReadOnly,)
 
     def get_queryset(self):
         """Получает queryset в соответствии с параметрами запроса.
@@ -141,7 +141,7 @@ class RecipeViewSet(ModelViewSet, AddDelViewMixin):
     Изменять рецепт может только автор или админы.
     """
     serializer_class = RecipeSerializer
-    permission_classes = (IsAuthorOrAdminOrReadOnly,)
+    permission_classes = (IsOwnerOrReadOnly,)
     pagination_class = PageLimitPagination
     add_serializer = ShortRecipeSerializer
 
