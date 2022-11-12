@@ -6,7 +6,6 @@ from rest_framework.serializers import (ModelSerializer, SerializerMethodField,
 from recipes.models import AmountIngredient, Ingredient, Recipe, Tag
 from users.models import MyUser
 from users.validators import username_validation
-
 from .services import (check_value_validate, is_hex_color,
                        recipe_amount_ingredients_set)
 
@@ -306,4 +305,77 @@ class RecipeSerializer(ModelSerializer):
         return super().update(recipe, validated_data)
 
     def to_representation(self, instance):
-        return RecipeSerializer(instance).data
+        return {'author': instance.author,
+                'tags': instance.tags,
+                'ingredients': instance.ingredients,
+                }
+
+
+class ShowRecipeSerializer(ModelSerializer):
+    """
+    Сериализатор просмотра модели Рецепт.
+    """
+    tags = TagSerializer(many=True)
+    author = UserSerializer(read_only=True)
+    ingredients = SerializerMethodField(method_name='get_ingredients')
+    is_favorited = SerializerMethodField(method_name='get_is_favorited')
+    is_in_shopping_cart = SerializerMethodField(
+        method_name='get_is_in_shopping_cart')
+
+    class Meta:
+        model = Recipe
+        fields = (
+            'id',
+            'tags',
+            'author',
+            'ingredients',
+            'is_favorited',
+            'is_in_shopping_cart',
+            'name',
+            'image',
+            'text',
+            'cooking_time'
+        )
+
+    def get_ingredients(self, obj):
+        """Получает список ингридиентов для рецепта.
+
+        Args:
+            obj (Recipe): Запрошенный рецепт.
+
+        Returns:
+            list: Список ингридиентов в рецепте.
+        """
+        obj.ingredients.values(
+            'id', 'name', 'measurement_unit', amount=F('recipe__amount')
+        )
+
+    def get_is_favorited(self, obj):
+        """Проверка - находится ли рецепт в избранном.
+
+        Args:
+            obj (Recipe): Переданный для проверки рецепт.
+
+        Returns:
+            bool: True - если рецепт в `избранном`
+            у запращивающего пользователя, иначе - False.
+        """
+        user = self.context.get('request').user
+        if user.is_anonymous:
+            return False
+        return user.favorites.filter(id=obj.id).exists()
+
+    def get_is_in_shopping_cart(self, obj):
+        """Проверка - находится ли рецепт в списке  покупок.
+
+        Args:
+            obj (Recipe): Переданный для проверки рецепт.
+
+        Returns:
+            bool: True - если рецепт в `списке покупок`
+            у запращивающего пользователя, иначе - False.
+        """
+        user = self.context.get('request').user
+        if user.is_anonymous:
+            return False
+        return user.carts.filter(id=obj.id).exists()

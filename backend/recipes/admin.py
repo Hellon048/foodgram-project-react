@@ -70,7 +70,9 @@ class RecipeAdmin(ModelAdmin):
     def favorites(self, obj):
         if Favorite.objects.filter(recipe=obj).exists():
             return Favorite.objects.filter(recipe=obj).count()
+
         return 0
+    favorites.short_description = 'Лайки'
 
 
 @register(Tag)

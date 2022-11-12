@@ -108,6 +108,11 @@ class Recipe(Model):
         on_delete=CASCADE,
         related_name='recipes',
     )
+    cart = ManyToManyField(
+        verbose_name='Список покупок',
+        related_name='carts',
+        to=MyUser,
+    )
     tags = ManyToManyField(
         verbose_name='Тег',
         related_name='recipes',
