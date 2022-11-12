@@ -43,7 +43,7 @@
 
 3. Перейдите в директорию infra/ и выполните команду для создания и запуска контейнеров.
     ```
-    sudo docker compose up -d --build
+    docker compose up -d --build
     ```
 > Возможна команда **$ sudo docker-compose up -d --build** (зависит от версии docker compose)
 
@@ -52,9 +52,9 @@
 4. В контейнере backend выполните миграции, создайте суперпользователя и соберите статику.
 
     ```
-    sudo docker compose exec backend python manage.py migrate
-    sudo docker compose exec backend python manage.py createsuperuser
-    sudo docker compose exec backend python manage.py collectstatic --no-input 
+    docker compose exec backend python manage.py migrate
+    docker compose exec backend python manage.py createsuperuser
+    docker compose exec backend python manage.py collectstatic --no-input 
     ```
 
 5. Загрузите в бд ингредиенты командой ниже.
@@ -67,11 +67,11 @@
     -  http://localhost/ - главная страница сайта;
     -  http://localhost/admin/ - админ панель;
     -  http://localhost/api/ - API проекта
-    -  http://localhost/api/docs/redoc.html - документация к API
+    -  http://localhost/api/docs/redoc.html - документация к API (Работает локально)
 
 ---
 ## Автор
-**[Наприенко Вячеслав ](https://github.com/Hellon048)**
+**[Наприенко Вячеслав](https://github.com/Hellon048)**
 
 ---
 ### Сервис доступен по адресу:
