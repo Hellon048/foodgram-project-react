@@ -32,8 +32,8 @@ services:
     volumes:
       - ./nginx.conf:/etc/nginx/conf.d/default.conf
       - ./frontend/build:/usr/share/nginx/html/
-      - ../docs/redoc.html:/var/html/redoc/redoc.html
-      - ../docs/openapi-schema.yaml:/var/html/redoc/redoc.yaml
+      - ../docs/redoc.html:/var/html/api/docs/redoc.html
+      - ../docs/openapi-schema.yaml:/var/html/api/docs/redoc.yaml
       - static_value:/var/html/static/
       - media_value:/var/html/media/
     depends_on:
