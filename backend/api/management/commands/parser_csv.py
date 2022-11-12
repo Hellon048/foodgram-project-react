@@ -24,11 +24,15 @@ class Command(BaseCommand):
                 data = json.load(f)
                 for ingredient in data:
                     try:
-                        Ingredient.objects.create(name=ingredient["name"],
+                        check = Ingredient.objects.create(name=ingredient["name"],
                                                   measurement_unit=ingredient[
                                                       "measurement_unit"])
+                        if check is True:
+                            print(f'Ингридиент {ingredient["name"]} '
+                                  f'{ingredient["measurement_unit"]} '
+                                  f'уже есть в базе')
                     except IntegrityError:
-                        print(f'Ингридиет {ingredient["name"]} '
+                        print(f'Ингридиент {ingredient["name"]} '
                               f'{ingredient["measurement_unit"]} '
                               f'уже есть в базе')
 
