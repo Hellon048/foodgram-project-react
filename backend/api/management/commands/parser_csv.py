@@ -24,9 +24,10 @@ class Command(BaseCommand):
                 data = json.load(f)
                 for ingredient in data:
                     try:
-                        check = Ingredient.objects.create(name=ingredient["name"],
-                                                  measurement_unit=ingredient[
-                                                      "measurement_unit"])
+                        check = Ingredient.objects.create(
+                            name=ingredient["name"],
+                            measurement_unit=ingredient[
+                                "measurement_unit"])
                         if check is True:
                             print(f'Ингридиент {ingredient["name"]} '
                                   f'{ingredient["measurement_unit"]} '
