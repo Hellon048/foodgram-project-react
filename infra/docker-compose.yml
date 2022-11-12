@@ -38,8 +38,25 @@ services:
     depends_on:
       - backend
       - frontend
+  certbot:
+    image: certbot/certbot
+    depends_on:
+    - nginx
+    container_name: certbot
+    volumes:
+      - etc-letsencrypt:/etc/letsencrypt
+      - www-html:/var/www/html
+    command: certonly --webroot --webroot-path=/var/www/html --email hellon048@gmail.com --agree-tos --no-eff-email -d http://backend:8000
+
 
 volumes:
+  www-html:
+  dbfile:
+  etc-letsencrypt:
   static_value:
   media_value:
   postgres_data:
+
+networks:
+  app:
+    driver: bridge
