@@ -1,55 +1,19 @@
-from string import hexdigits
+from collections import Counter
 
-from rest_framework.serializers import ValidationError
-
-from recipes.models import AmountIngredient
+from recipes.models import IngredientRecipe
 
 
-def recipe_amount_ingredients_set(recipe, ingredients):
-    """Записывает ингредиенты вложенные в рецепт.
-    """
-    ingredients_list = []
-    for ingredient in ingredients:
-        new_ingredient = AmountIngredient(
-            recipe=recipe,
-            ingredients=ingredient['ingredient'],
-            amount=ingredient['amount']
-        )
-        ingredients_list.append(new_ingredient)
-        AmountIngredient.objects.bulk_create(ingredients_list)
-
-
-def check_value_validate(value, klass=None):
-    """Проверяет корректность переданного значения.
-    """
-    if not str(value).isdecimal():
-        raise ValidationError(
-            f'{value} должно содержать цифру'
-        )
-    if klass:
-        obj = klass.objects.filter(id=value)
-        if not obj:
-            raise ValidationError(
-                f'{value} не существует'
-            )
-        return obj[0]
-
-
-def is_hex_color(value):
-    """Проверяет - может ли значение быть шестнадцатеричным цветом.
-    """
-    if len(value) not in (3, 6):
-        raise ValidationError(
-            f'{value} не правильной длины ({len(value)}).'
-        )
-    if not set(value).issubset(hexdigits):
-        raise ValidationError(
-            f'{value} не шестнадцатиричное.'
-        )
-
-
-# Словарь для сопостановления латинской и русской стандартных раскладок.
-incorrect_layout = str.maketrans(
-    'qwertyuiop[]asdfghjkl;\'zxcvbnm,./',
-    'йцукенгшщзхъфывапролджэячсмитьбю.'
-)
+def get_shopping_cart(user):
+    ingredients = IngredientRecipe.objects.filter(
+        recipe__shop_list__user=user.user
+    )
+    compressed_ingredients = Counter()
+    for ing in ingredients:
+        compressed_ingredients[
+            (ing.ingredient.name, ing.ingredient.measurement_unit)
+        ] += ing.amount
+    return ([
+        f"- {name}: {amount} {measurement_unit}\n"
+        for (name, measurement_unit), amount
+        in compressed_ingredients.items()
+    ])

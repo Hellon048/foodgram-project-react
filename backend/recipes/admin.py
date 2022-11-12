@@ -1,88 +1,97 @@
-from django.contrib.admin import ModelAdmin, TabularInline, register, site
-from django.utils.safestring import mark_safe
+from django.contrib import admin
 
-from .models import AmountIngredient, Ingredient, Recipe, Tag, Favorite
+from .models import (
+    Favorite,
+    Follow,
+    Ingredient,
+    IngredientRecipe,
+    Recipe,
+    ShoppingList,
+    Tag
+)
 
-site.site_header = 'Администрирование Foodgram'
-EMPTY_VALUE_DISPLAY = 'Значение не указано'
-
-
-class IngredientInline(TabularInline):
-    model = AmountIngredient
-    extra = 2
-
-
-@register(AmountIngredient)
-class LinksAdmin(ModelAdmin):
-    pass
+admin.site.empty_value_display = 'Значение отсутствует'
 
 
-@register(Ingredient)
-class IngredientAdmin(ModelAdmin):
+@admin.register(Tag)
+class TagAdmin(admin.ModelAdmin):
+    """Класс настройки раздела тегов"""
+
+    list_display = ('pk', 'name', 'slug')
+
+
+@admin.register(Ingredient)
+class IngredientAdmin(admin.ModelAdmin):
+    """Класс настройки раздела игредиентов"""
+
+    list_display = ('pk', 'name', 'measurement_unit')
+    search_fields = ('name',)
+
+
+class IngredientRecipeInline(admin.TabularInline):
+    """
+    Вспомогательный класс, чтобы в классе RecipeAdmin можно было настроивать
+    ингредиенты.
+    """
+
+    model = IngredientRecipe
+    min_num = 1
+    extra = 1
+
+
+@admin.register(Recipe)
+class RecipeAdmin(admin.ModelAdmin):
+    """Класс настройки раздела рецептов"""
+
     list_display = (
-        'name', 'measurement_unit',
-    )
-    search_fields = (
-        'name',
-    )
-    list_filter = (
-        'name',
+        'pk', 'name', 'author', 'get_favorites', 'get_tags', 'get_ingredients')
+    list_filter = ('author', 'name', 'tags')
+    search_fields = ('name',)
+    inlines = (IngredientRecipeInline,)
+
+    def get_favorites(self, obj):
+        return obj.favorites.count()
+
+    get_favorites.short_description = (
+        'Количество добавлений рецепта в избранное'
     )
 
-    save_on_top = True
-    empty_value_display = EMPTY_VALUE_DISPLAY
+    def get_tags(self, obj):
+        return '\n'.join((tag.name for tag in obj.tags.all()))
 
-
-@register(Recipe)
-class RecipeAdmin(ModelAdmin):
-    list_display = (
-        'name', 'author', 'get_image', 'get_ingredients',
-    )
-    fields = (
-        ('name', 'cooking_time',),
-        ('author', 'tags',),
-        ('text',),
-        ('image',),
-    )
-    raw_id_fields = ('author', )
-    search_fields = (
-        'name', 'author',
-    )
-    list_filter = (
-        'name', 'author__username',
-    )
-
-    inlines = (IngredientInline,)
-    save_on_top = True
-    empty_value_display = EMPTY_VALUE_DISPLAY
-
-    def get_image(self, obj):
-        return mark_safe(f'<img src={obj.image.url} width="80" hieght="30"')
-
-    get_image.short_description = 'Изображение'
+    get_tags.short_description = 'Тег или список тегов'
 
     def get_ingredients(self, obj):
         return ', '.join(
             [str(ingredients) for ingredients in obj.ingredients.all()]
         )
+
     get_ingredients.short_description = 'Ингредиенты'
 
-    def favorites(self, obj):
-        if Favorite.objects.filter(recipe=obj).exists():
-            return Favorite.objects.filter(recipe=obj).count()
 
-        return 0
-    favorites.short_description = 'Лайки'
+@admin.register(Follow)
+class FollowAdmin(admin.ModelAdmin):
+    """Класс настройки раздела подписки"""
+
+    list_display = ('pk', 'user', 'author')
+    search_fields = ('user', 'author')
+    list_filter = ('user', 'author')
 
 
-@register(Tag)
-class TagAdmin(ModelAdmin):
-    list_display = (
-        'name', 'color', 'slug',
-    )
-    search_fields = (
-        'name', 'color'
-    )
+@admin.register(Favorite)
+class FavoriteAdmin(admin.ModelAdmin):
+    """Класс настройки раздела избранное"""
 
-    save_on_top = True
-    empty_value_display = EMPTY_VALUE_DISPLAY
+    list_display = ('pk', 'user', 'recipe')
+
+
+@admin.register(IngredientRecipe)
+class IngredientRecipeAdmin(admin.ModelAdmin):
+    """Класс настройки соответствия ингредиентов и рецепта"""
+
+    list_display = ('pk', 'ingredient', 'recipe', 'amount')
+
+
+@admin.register(ShoppingList)
+class ShoppingListAdmin(admin.ModelAdmin):
+    list_display = ('id', 'user', 'recipe')

@@ -1,24 +1,20 @@
-from django.contrib.admin import register
+from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 
-from .models import MyUser
+from .models import User
 
 
-@register(MyUser)
-class MyUserAdmin(UserAdmin):
+@admin.register(User)
+class UserAdmin(UserAdmin):
+    """Класс настройки раздела пользователей."""
+
     list_display = (
-        'username', 'first_name', 'last_name', 'email',
+        'pk',
+        'username',
+        'email',
+        'first_name',
+        'last_name',
     )
-    fields = (
-        ('username', 'email', ),
-        ('first_name', 'last_name', ),
-    )
-    fieldsets = []
-
-    search_fields = (
-        'username', 'email',
-    )
-    list_filter = (
-        'first_name', 'email',
-    )
-    save_on_top = True
+    empty_value_display = 'Значение отсутствует'
+    list_filter = ('username', 'email')
+    search_fields = ('username', 'email')
