@@ -21,6 +21,8 @@
 
 Проект использует базу данных PostgreSQL. Проект запускается в трёх контейнерах (nginx, PostgreSQL и Django) (контейнер frontend используется лишь для подготовки файлов) через docker-compose на сервере. Образ с проектом загружается на Docker Hub.
 
+ФИЧА - воркфлоу автоматически присваивает м продлевает сертификат безопасности SertBot
+
 ## Запуск проекта с помощью Docker
 
 1. Склонируйте репозиторий на локальную машину.
@@ -45,9 +47,8 @@
     ```
     docker compose up -d --build
     ```
-> Возможна команда **$ sudo docker-compose up -d --build** (зависит от версии docker compose)
+> Возможна команда **$ docker-compose up -d --build** (зависит от версии docker compose)
 
-> В Windows команда выполняется без **sudo**
 
 4. В контейнере backend выполните миграции, создайте суперпользователя и соберите статику.
 
@@ -60,14 +61,14 @@
 5. Загрузите в бд ингредиенты командой ниже.
 
     ```
-    sudo docker compose exec backend python manage.py parser_csv
+    docker compose exec backend python manage.py parser_csv
     ```
 
 6. Готово! Ниже представлены доступные адреса проекта:
     -  http://localhost/ - главная страница сайта;
     -  http://localhost/admin/ - админ панель;
     -  http://localhost/api/ - API проекта
-    -  http://localhost/api/docs/redoc.html - документация к API (Работает локально)
+    -  http://localhost/api/docs/redoc.html - документация к API
 
 ---
 ## Автор
@@ -76,5 +77,6 @@
 ---
 ### Сервис доступен по адресу:
 ```
-http://51.250.3.210/
+**[Food-gram.online](https://food-gram.online/recipes)**
+
 ```
