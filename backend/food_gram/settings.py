@@ -15,7 +15,8 @@ DEBUG = os.getenv('DEBUG', default=False)
 ALLOWED_HOSTS = ['*']
 
 CSRF_TRUSTED_ORIGINS = ['http://localhost', 'http://127.0.0.1',
-                        'http://backend', 'http://51.250.3.210']
+                        'http://backend', 'http://51.250.3.210',
+                        'http://food-gram.online']
 
 # Application definition
 
@@ -111,7 +112,6 @@ REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'PAGE_SIZE': 6,
 }
-
 
 DJOSER = {
     'LOGIN_FIELD': 'email',
